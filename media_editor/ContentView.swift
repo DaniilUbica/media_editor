@@ -8,17 +8,26 @@
 import SwiftUI
 
 struct ContentView: View {
+    
+    @EnvironmentObject private var appState: AppState
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        if let currRoute = appState.currentRoute {
+            switch currRoute {
+            case .RemoveBackground:
+                RemoveBackgroundView()
+            case .ImproveQuality:
+                ImproveQualityView()
+            case .Main:
+                MainView()
+            }
         }
-        .padding()
     }
 }
 
-#Preview {
-    ContentView()
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
+        .environmentObject(AppState())
+    }
 }
