@@ -13,15 +13,11 @@ struct MainView: View {
     
     var body: some View {
         VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Media Editor")
             CustomButton(text: "Remove Background") {
-                appState.currRoute = .RemoveBackground
+                appState.currentRoute = .RemoveBackground
             }
             CustomButton(text: "Improve Quality") {
-                appState.currRoute = .ImproveQuality
+                appState.currentRoute = .ImproveQuality
             }
         }
         .padding()
@@ -31,13 +27,15 @@ struct MainView: View {
 struct RemoveBackgroundView: View {
     
     @EnvironmentObject private var appState: AppState
+    @State var filePath: String
+    
+    init(filePath: String) {
+        self.filePath = filePath
+    }
     
     var body: some View {
         VStack {
-            Text("Remove Background View")
-            CustomButton(text: "To main page") {
-                appState.currRoute = .Main
-            }
+            ImagePreview(filePath: filePath)
         }
         .padding()
     }
@@ -50,9 +48,6 @@ struct ImproveQualityView: View {
     var body: some View {
         VStack {
             Text("Improve Quality View")
-            CustomButton(text: "To main page") {
-                appState.currRoute = .Main
-            }
         }
         .padding()
     }

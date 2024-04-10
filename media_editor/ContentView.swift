@@ -11,15 +11,31 @@ struct ContentView: View {
     
     @EnvironmentObject private var appState: AppState
     
+    @State private var filePath: String = ""
+    
     var body: some View {
-        if let currRoute = appState.currentRoute {
-            switch currRoute {
-            case .RemoveBackground:
-                RemoveBackgroundView()
-            case .ImproveQuality:
-                ImproveQualityView()
-            case .Main:
-                MainView()
+        VStack {
+            if (appState.currentRoute != .Main) {
+                CustomButton(text: "<-") {
+                    appState.currentRoute = .Main
+                }
+            }
+            else {
+                HeaderAppInfo()
+                FilePicker(pathToFile: $filePath)
+            }
+            
+            Text("Current loaded file path: \(filePath)")
+            
+            if let currRoute = appState.currentRoute {
+                switch currRoute {
+                case .RemoveBackground:
+                    RemoveBackgroundView(filePath: filePath)
+                case .ImproveQuality:
+                    ImproveQualityView()
+                case .Main:
+                    MainView()
+                }
             }
         }
     }

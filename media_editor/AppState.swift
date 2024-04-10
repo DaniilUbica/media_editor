@@ -17,6 +17,11 @@ class AppState: ObservableObject {
     @Published var currRoute: Route = .Main
     
     var currentRoute: Route? {
-        currRoute
+        get {
+            currRoute
+        }
+        set(newRoute) {
+            currRoute = newRoute!
+        }
     }
 }
