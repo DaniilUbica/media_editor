@@ -27,15 +27,10 @@ struct MainView: View {
 struct RemoveBackgroundView: View {
     
     @EnvironmentObject private var appState: AppState
-    @State var filePath: String
-    
-    init(filePath: String) {
-        self.filePath = filePath
-    }
-    
+        
     var body: some View {
         VStack {
-            ImagePreview(filePath: filePath)
+            ImagePreview()
         }
         .padding()
     }

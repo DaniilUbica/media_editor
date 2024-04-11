@@ -10,8 +10,7 @@ import SwiftUI
 struct ContentView: View {
     
     @EnvironmentObject private var appState: AppState
-    
-    @State private var filePath: String = ""
+    @EnvironmentObject private var imageManager: ImageManager
     
     var body: some View {
         VStack {
@@ -19,24 +18,34 @@ struct ContentView: View {
                 CustomButton(text: "<-") {
                     appState.currentRoute = .Main
                 }
+                .padding(.top)
             }
             else {
                 HeaderAppInfo()
-                FilePicker(pathToFile: $filePath)
+                HStack {
+                    TextField("Upload file path", text: $imageManager.imagePath)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .frame(minWidth: textfieldMinimumWidth, idealWidth: textfieldMinimumWidth, minHeight: textfieldMinimumHeight, idealHeight: textfieldMinimumHeight)
+                    FilePicker()
+                }
+                .padding()
+                
+                FileSaver()
+                .padding()
             }
-            
-            Text("Current loaded file path: \(filePath)")
             
             if let currRoute = appState.currentRoute {
                 switch currRoute {
                 case .RemoveBackground:
-                    RemoveBackgroundView(filePath: filePath)
+                    RemoveBackgroundView()
                 case .ImproveQuality:
                     ImproveQualityView()
                 case .Main:
                     MainView()
                 }
             }
+            
+            ErrorPrinter()
         }
     }
 }
@@ -45,5 +54,6 @@ struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
         .environmentObject(AppState())
+        .environmentObject(ImageManager())
     }
 }

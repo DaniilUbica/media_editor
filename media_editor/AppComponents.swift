@@ -21,19 +21,19 @@ struct HeaderAppInfo:View {
 
 struct FilePicker: View {
     
-    @Binding var pathToFile: String
-    @State private var openFile = false
+    @EnvironmentObject private var imageManager: ImageManager
+    @State private var openingFile = false
     
     var body: some View {
         Button("Open file") {
-            openFile.toggle()
+            openingFile.toggle()
         }
-        .fileImporter(isPresented: $openFile, allowedContentTypes: [.image, .video], allowsMultipleSelection: false) {
+        .fileImporter(isPresented: $openingFile, allowedContentTypes: [.image, .video], allowsMultipleSelection: false) {
             result in
             
             do {
                 let fileURL = try result.get()
-                pathToFile = fileURL.first?.path() ?? "file not available"
+                imageManager.imagePath = fileURL.first?.path() ?? "file not available"
             }
             catch{
                print("error reading file \(error.localizedDescription)")
@@ -42,9 +42,20 @@ struct FilePicker: View {
     }
 }
 
+struct FileSaver: View {
+    
+    @EnvironmentObject private var imageManager: ImageManager
+    
+    var body: some View {
+        Button("Save file") {
+            imageManager.saveImage()
+        }
+    }
+}
+
 struct ImagePreview: View {
     
-    @State var filePath: String
+    @EnvironmentObject private var imageManager: ImageManager
     
     var body: some View {
         VStack {
@@ -56,12 +67,8 @@ struct ImagePreview: View {
         .padding()
     }
     
-    init(filePath: String) {
-        self.filePath = filePath
-    }
-    
     private func imageFromPath() -> Image {
-        if let nsImage = NSImage(contentsOfFile: filePath) {
+        if let nsImage = imageManager.image {
             return Image(nsImage: nsImage)
         }
         else {
@@ -79,6 +86,35 @@ struct CustomButton: View {
             action()
         }
         .font(.title)
-        .frame(minWidth: button_minimum_width, idealWidth: button_ideal_width, minHeight: button_minimum_height, idealHeight: button_ideal_height)
+        .frame(minWidth: buttonMinimumWidth, idealWidth: buttonIdealWidth, minHeight: buttonMinimumHeight, idealHeight: buttonIdealHeight)
+    }
+}
+
+struct ErrorPrinter: View {
+    
+    @EnvironmentObject private var imageManager: ImageManager
+    
+    var body: some View {
+       
+        Text(getErrorMessage())
+            .font(/*@START_MENU_TOKEN@*/.title/*@END_MENU_TOKEN@*/)
+            .foregroundStyle(.red)
+            .padding()
+    }
+    
+    private func getErrorMessage() -> String {
+        let errorString: String
+        
+        switch imageManager.errorType {
+        case .NoError:
+            errorString = ""
+        case .GetDataError:
+            errorString = "Error: can't get image data"
+        case .SaveMediaError:
+            errorString = "Error: can't save image"
+        case .NoImageError:
+            errorString = "Error: image is empty"
+        }
+        return errorString
     }
 }
