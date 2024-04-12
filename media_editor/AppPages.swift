@@ -27,12 +27,18 @@ struct MainView: View {
 struct RemoveBackgroundView: View {
     
     @EnvironmentObject private var appState: AppState
+    @EnvironmentObject private var imageManager: ImageManager
         
     var body: some View {
         VStack {
-            ImagePreview()
+            imageWithoutBackground()
         }
         .padding()
+    }
+    
+    private func imageWithoutBackground() -> ImagePreview{
+        imageManager.removeBackground()
+        return ImagePreview()
     }
 }
 

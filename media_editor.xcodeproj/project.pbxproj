@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E05F67CF2BC991EB001332F5 /* BackgroundReplacer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E05F67CE2BC991EB001332F5 /* BackgroundReplacer.swift */; };
 		E0B333EA2BC84B7D00419E87 /* ImageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0B333E92BC84B7D00419E87 /* ImageManager.swift */; };
 		E0FD1C2A2BC5B49700C52CA3 /* media_editorApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0FD1C292BC5B49700C52CA3 /* media_editorApp.swift */; };
 		E0FD1C2C2BC5B49700C52CA3 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0FD1C2B2BC5B49700C52CA3 /* ContentView.swift */; };
@@ -39,6 +40,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		E05F67CE2BC991EB001332F5 /* BackgroundReplacer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundReplacer.swift; sourceTree = "<group>"; };
 		E0B333E92BC84B7D00419E87 /* ImageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageManager.swift; sourceTree = "<group>"; };
 		E0FD1C262BC5B49700C52CA3 /* media_editor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = media_editor.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E0FD1C292BC5B49700C52CA3 /* media_editorApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = media_editorApp.swift; sourceTree = "<group>"; };
@@ -109,6 +111,7 @@
 				E0FD1C292BC5B49700C52CA3 /* media_editorApp.swift */,
 				E0FD1C2B2BC5B49700C52CA3 /* ContentView.swift */,
 				E0FD1C2D2BC5B49800C52CA3 /* Assets.xcassets */,
+				E05F67CE2BC991EB001332F5 /* BackgroundReplacer.swift */,
 				E0FD1C322BC5B49800C52CA3 /* media_editor.entitlements */,
 				E0FD1C2F2BC5B49800C52CA3 /* Preview Content */,
 				E0FD1C562BC5B6D500C52CA3 /* Constants.swift */,
@@ -276,6 +279,7 @@
 			files = (
 				E0B333EA2BC84B7D00419E87 /* ImageManager.swift in Sources */,
 				E0FD1C592BC5BE5500C52CA3 /* AppPages.swift in Sources */,
+				E05F67CF2BC991EB001332F5 /* BackgroundReplacer.swift in Sources */,
 				E0FD1C5D2BC5C6C900C52CA3 /* AppState.swift in Sources */,
 				E0FD1C2C2BC5B49700C52CA3 /* ContentView.swift in Sources */,
 				E0FD1C2A2BC5B49700C52CA3 /* media_editorApp.swift in Sources */,
@@ -455,8 +459,11 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.daniilubica.media-editor";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -480,8 +487,11 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.daniilubica.media-editor";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};

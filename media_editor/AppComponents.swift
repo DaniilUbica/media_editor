@@ -33,7 +33,10 @@ struct FilePicker: View {
             
             do {
                 let fileURL = try result.get()
-                imageManager.imagePath = fileURL.first?.path() ?? "file not available"
+                if let url = fileURL.first {
+                    imageManager.loadImage(url.path())
+                    imageManager.currFileExtension = url.pathExtension
+                }
             }
             catch{
                print("error reading file \(error.localizedDescription)")
@@ -59,21 +62,12 @@ struct ImagePreview: View {
     
     var body: some View {
         VStack {
-            imageFromPath()
+            imageManager.uiImage
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(minWidth: 200.0, minHeight: 200.0)
         }
         .padding()
-    }
-    
-    private func imageFromPath() -> Image {
-        if let nsImage = imageManager.image {
-            return Image(nsImage: nsImage)
-        }
-        else {
-            return Image(systemName: "photo")
-        }
     }
 }
 

@@ -23,9 +23,6 @@ struct ContentView: View {
             else {
                 HeaderAppInfo()
                 HStack {
-                    TextField("Upload file path", text: $imageManager.imagePath)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .frame(minWidth: textfieldMinimumWidth, idealWidth: textfieldMinimumWidth, minHeight: textfieldMinimumHeight, idealHeight: textfieldMinimumHeight)
                     FilePicker()
                 }
                 .padding()

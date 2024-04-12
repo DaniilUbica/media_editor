@@ -21,3 +21,6 @@ let textfieldMinimumWidth = 175.0;
 let textfieldMinimumHeight = 35.0;
 let textfieldIdealWidth = 275.0;
 let textfieldIdealHeight = 35.0;
+
+let transparentBackground = "transparent"
+let starsBackground = "stars"

@@ -7,6 +7,7 @@
 
 import Foundation
 import Cocoa
+import SwiftUI
 
 enum ErrorType {
     case NoError
@@ -17,96 +18,113 @@ enum ErrorType {
 
 class ImageManager: ObservableObject {
     
-    @Published var m_errorType: ErrorType      = .NoError
-    @Published var m_imagePath: String         = ""
-    @Published var m_currFileExtension: String = ""
-    private var m_image: NSImage?              = nil
+    @Published var mErrorType: ErrorType = .NoError
+    @Published var mCurrFileExtension: String = ""
+    private var mImage: NSImage? = nil
+    private let mBackgroundReplacer: BackgroundReplacer = BackgroundReplacer()
      
     var errorType: ErrorType {
-        m_errorType
+        mErrorType
     }
     
-    var imagePath: String {
+    var currFileExtension: String {
         get {
-            m_imagePath
-        }
-        set(newPath) {
-            if m_errorType == .NoImageError && m_imagePath != newPath {
-                m_errorType = .NoError
-            }
-            
-            m_imagePath = newPath
-            m_currFileExtension = URL(fileURLWithPath: m_imagePath).pathExtension
-        }
-    }
-    
-    var currFileFormat: String {
-        get {
-            m_currFileExtension
+            mCurrFileExtension
         }
         set(newExtension) {
-            m_currFileExtension = newExtension
+            mCurrFileExtension = newExtension
         }
     }
     
     var image: NSImage? {
-        loadImage()
-        return m_image
+        get {
+            return mImage
+        }
+        set(newImage) {
+            mImage = newImage
+        }
+    }
+    
+    var uiImage: Image {
+        get {
+            if let image = mImage {
+                return Image(nsImage: image)
+            }
+            return Image(systemName: "photo")
+        }
     }
     
     
     func saveImage() {
-        if let image = m_image {
+        if let image = mImage {
             let panel = NSSavePanel()
             panel.allowedContentTypes = [.image]
             panel.canCreateDirectories = true
             panel.isExtensionHidden = false
-            panel.nameFieldStringValue = "Untitled.\(m_currFileExtension)"
+            panel.nameFieldStringValue = "Untitled.\(mCurrFileExtension)"
             panel.begin { response in
                 if response == .OK {
                     if let url = panel.url {
-                        self.saveImage(image, url: url)
+                        self.saveImage(image, url)
                     }
                 }
             }
         }
         else {
-            if !m_imagePath.isEmpty {
-                if let image = NSImage(contentsOfFile: m_imagePath) {
-                    m_image = image
-                }
-                else {
-                    m_errorType = .NoImageError
-                    return
-                }
-                saveImage()
-            }
-            else {
-                m_errorType = .NoImageError
-                return
+            mErrorType = .NoImageError
+            return
+        }
+    }
+        
+    func loadImage(_ path: String) {
+        mImage = NSImage(contentsOfFile: path)
+    }
+    
+    func removeBackground() {
+        if let image = mImage {
+            if let newImage = mBackgroundReplacer.removeBackground(image) {
+                let rep = NSCIImageRep(ciImage: newImage)
+                mImage = NSImage(size: rep.size)
+                mImage?.addRepresentation(rep)
             }
         }
     }
     
-    private func loadImage() {
-        if !m_imagePath.isEmpty {
-            m_image = NSImage(contentsOfFile: m_imagePath)
+    func replaceBackground(_ newBackground: NSImage) {
+        if let image = mImage {
+            if let newImage = mBackgroundReplacer.removeBackground(image, newBackground) {
+                let rep = NSCIImageRep(ciImage: newImage)
+                mImage = NSImage(size: rep.size)
+                mImage?.addRepresentation(rep)
+            }
         }
     }
     
-    private func saveImage(_ image: NSImage, url: URL) {
+    func replaceBackground(_ newBackgroundPath: String) {
+        if let newBackground = NSImage(contentsOfFile: newBackgroundPath) {
+            if let image = mImage {
+                if let newImage = mBackgroundReplacer.removeBackground(image, newBackground) {
+                    let rep = NSCIImageRep(ciImage: newImage)
+                    mImage = NSImage(size: rep.size)
+                    mImage?.addRepresentation(rep)
+                }
+            }
+        }
+    }
+    
+    private func saveImage(_ image: NSImage, _ url: URL) {
         guard let imageData = image.tiffRepresentation,
               let bitmapImage = NSBitmapImageRep(data: imageData),
               let data = bitmapImage.representation(using: .png, properties: [:]) else {
-            m_errorType = .GetDataError
+            mErrorType = .GetDataError
             return
         }
         
         do {
             try data.write(to: url)
-            m_errorType = .NoError
+            mErrorType = .NoError
         } catch {
-            m_errorType = .SaveMediaError
+            mErrorType = .SaveMediaError
             return
         }
     }
