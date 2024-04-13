@@ -10,6 +10,7 @@ import Foundation
 enum Route {
     case Main
     case RemoveBackground
+    case ReplaceBackground
     case ImproveQuality
 }
 

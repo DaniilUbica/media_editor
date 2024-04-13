@@ -11,7 +11,7 @@ import Vision
 class BackgroundReplacer {
     
     func replaceBackground(_ image: NSImage, _ background: NSImage) -> CIImage? {
-        let request = VNGeneratePersonSegmentationRequest()
+        let request = VNGenerateForegroundInstanceMaskRequest()
         
         guard let cgImage = getCGImageFromNSImage(image) else {
             print("Error getting CGImage")
@@ -27,14 +27,18 @@ class BackgroundReplacer {
         
         do {
             try requestHandler.perform([request])
-            guard let mask = request.results?.first else {
+            guard let result = request.results?.first
+            else {
                 print("Error getting mask")
                 return nil
             }
             
+            let mask = try result.generateScaledMaskForImage(forInstances: result.allInstances, from: requestHandler)
+
+            
             let ciImage = CIImage(cgImage: cgImage)
             let ciBackground = CIImage(cgImage: cgBackground)
-            let maskImage = CIImage(cvPixelBuffer: mask.pixelBuffer)
+            let maskImage = CIImage(cvPixelBuffer: mask)
             
             let img = blendImages(ciImage, maskImage, ciBackground)
             return img

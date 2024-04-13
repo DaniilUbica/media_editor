@@ -16,9 +16,12 @@ struct MainView: View {
             CustomButton(text: "Remove Background") {
                 appState.currentRoute = .RemoveBackground
             }
-            CustomButton(text: "Improve Quality") {
-                appState.currentRoute = .ImproveQuality
+            CustomButton(text: "Replace Background") {
+                appState.currentRoute = .ReplaceBackground
             }
+//            CustomButton(text: "Improve Quality") {
+//                appState.currentRoute = .ImproveQuality
+//            }
         }
         .padding()
     }
@@ -45,12 +48,49 @@ struct RemoveBackgroundView: View {
     }
     
     private func imageWithoutBackground() -> ImagePreview {
-        imageManager.replaceBackground(NSImage(named: starsBackground)!)
+        DispatchQueue.main.async {
+            imageManager.removeBackground()
+        }
         return ImagePreview(imagePreviewWidth, imagePreviewHeight)
     }
 }
 
-struct ImproveQualityView: View {    
+struct ReplaceBackgroundView: View {
+    
+    @EnvironmentObject private var appState: AppState
+    @EnvironmentObject private var imageManager: ImageManager
+    @State private var showingReplaced: Bool = false
+    @State private var backgroundFilePath: String = ""
+        
+    var body: some View {
+        
+            if !showingReplaced {
+                ImagePreview(imagePreviewWidth, imagePreviewHeight)
+            }
+            else {
+                imageWithReplacedBackground()
+            }
+        
+            VStack {
+                FilePicker(filePath: $backgroundFilePath, buttonText: "Open background", rewriteImageManagerImage: false)
+                
+                CustomButton(text: "Replace background") {
+                    showingReplaced.toggle()
+                }
+            }
+    }
+    
+    private func imageWithReplacedBackground() -> ImagePreview {
+        DispatchQueue.main.async {
+            if let background = NSImage(contentsOfFile: backgroundFilePath) {
+                imageManager.replaceBackground(background)
+            }
+        }
+        return ImagePreview(imagePreviewWidth, imagePreviewHeight)
+    }
+}
+
+struct ImproveQualityView: View {
     
     @EnvironmentObject private var appState: AppState
 

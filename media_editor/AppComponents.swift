@@ -10,10 +10,6 @@ import SwiftUI
 struct HeaderAppInfo:View {
     var body: some View {
         VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-                .padding(.top)
             Text("Media Editor")
         }
     }
@@ -24,9 +20,11 @@ struct FilePicker: View {
     @EnvironmentObject private var imageManager: ImageManager
     @State private var openingFile = false
     @Binding var filePath: String
+    @State var buttonText: String
+    @State var rewriteImageManagerImage: Bool = true
     
     var body: some View {
-        Button("Open file") {
+        Button(buttonText) {
             openingFile.toggle()
         }
         .fileImporter(isPresented: $openingFile, allowedContentTypes: [.image, .video], allowsMultipleSelection: false) {
@@ -36,11 +34,15 @@ struct FilePicker: View {
                 let fileURL = try result.get()
                 if let url = fileURL.first {
                     filePath = url.path()
-                    imageManager.loadImage(filePath)
-                    imageManager.currFileExtension = url.pathExtension
+                    if rewriteImageManagerImage {
+                        DispatchQueue.main.async {
+                            imageManager.loadImage(filePath)
+                            imageManager.currFileExtension = url.pathExtension
+                        }
+                    }
                 }
             }
-            catch{
+            catch {
                print("error reading file \(error.localizedDescription)")
             }
         }
@@ -53,7 +55,9 @@ struct FileSaver: View {
     
     var body: some View {
         Button("Save file") {
-            imageManager.saveImage()
+            DispatchQueue.main.async {
+                imageManager.saveImage()
+            }
         }
     }
 }
@@ -88,7 +92,6 @@ struct CustomButton: View {
         Button(text) {
             action()
         }
-        .font(.title)
         .frame(minWidth: buttonMinimumWidth, idealWidth: buttonIdealWidth, minHeight: buttonMinimumHeight, idealHeight: buttonIdealHeight)
     }
 }
@@ -98,9 +101,8 @@ struct ErrorPrinter: View {
     @EnvironmentObject private var imageManager: ImageManager
     
     var body: some View {
-       
         Text(getErrorMessage())
-            .font(/*@START_MENU_TOKEN@*/.title/*@END_MENU_TOKEN@*/)
+            .font(.title)
             .foregroundStyle(.red)
             .padding()
     }

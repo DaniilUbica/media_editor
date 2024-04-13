@@ -44,7 +44,7 @@ class ImageManager: ObservableObject {
         }
         set(newImage) {
             mImage = newImage
-            if mErrorType == .NoImageError {
+            if mImage != nil && mErrorType == .NoImageError {
                 mErrorType = .NoError
             }
         }
@@ -83,6 +83,9 @@ class ImageManager: ObservableObject {
         
     func loadImage(_ path: String) {
         mImage = NSImage(contentsOfFile: path)
+        if mErrorType == .NoImageError {
+            mErrorType = .NoError
+        }
     }
     
     func removeBackground() {

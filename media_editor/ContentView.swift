@@ -12,6 +12,7 @@ struct ContentView: View {
     @EnvironmentObject private var appState: AppState
     @EnvironmentObject private var imageManager: ImageManager
     @State private var filePath: String = ""
+    @State private var backgroundFilePath: String = ""
     
     var body: some View {
         VStack {
@@ -23,22 +24,25 @@ struct ContentView: View {
             }
             else {
                 HeaderAppInfo()
+                    .padding(.top)
                 Text("Current file: \(filePath)")
                     .padding(.top)
                 ImagePreview(mainPageImagePreviewWidth, mainPageImagePreviewHeight)
+                    .padding(.top)
                 HStack {
-                    FilePicker(filePath: $filePath)
+                    FilePicker(filePath: $filePath, buttonText: "Open image")
+                        .padding()
+                    FileSaver()
+                        .padding()
                 }
-                .padding()
-                
-                FileSaver()
-                .padding()
             }
             
             if let currRoute = appState.currentRoute {
                 switch currRoute {
                 case .RemoveBackground:
                     RemoveBackgroundView()
+                case .ReplaceBackground:
+                    ReplaceBackgroundView()
                 case .ImproveQuality:
                     ImproveQualityView()
                 case .Main:
@@ -47,6 +51,7 @@ struct ContentView: View {
             }
             
             ErrorPrinter()
+                .padding(.bottom)
         }
     }
 }

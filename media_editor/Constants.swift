@@ -7,8 +7,8 @@
 
 import Foundation
 
-let mainWindowMinimumWidth = 250.0;
-let mainWindowMinimumHeight = 400.0;
+let mainWindowMinimumWidth = 300.0;
+let mainWindowMinimumHeight = 450.0;
 let mainWindowIdealWidth = 350.0;
 let mainWindowIdealHeight = 500.0;
 
