@@ -14,6 +14,8 @@ enum ErrorType {
     case GetDataError
     case SaveMediaError
     case NoImageError
+    case BackgroundReplaceError
+    case BackgroundRemoveError
 }
 
 class ImageManager: ObservableObject {
@@ -42,6 +44,9 @@ class ImageManager: ObservableObject {
         }
         set(newImage) {
             mImage = newImage
+            if mErrorType == .NoImageError {
+                mErrorType = .NoError
+            }
         }
     }
     
@@ -87,27 +92,38 @@ class ImageManager: ObservableObject {
                 mImage = NSImage(size: rep.size)
                 mImage?.addRepresentation(rep)
             }
+            else {
+                mErrorType = .BackgroundRemoveError
+            }
+        }
+        else {
+            mErrorType = .NoImageError
         }
     }
     
     func replaceBackground(_ newBackground: NSImage) {
         if let image = mImage {
-            if let newImage = mBackgroundReplacer.removeBackground(image, newBackground) {
+            if let newImage = mBackgroundReplacer.replaceBackground(image, newBackground) {
                 let rep = NSCIImageRep(ciImage: newImage)
                 mImage = NSImage(size: rep.size)
                 mImage?.addRepresentation(rep)
             }
+            else {
+                mErrorType = .BackgroundReplaceError
+            }
+        }
+        else {
+            mErrorType = .NoImageError
         }
     }
     
     func replaceBackground(_ newBackgroundPath: String) {
         if let newBackground = NSImage(contentsOfFile: newBackgroundPath) {
-            if let image = mImage {
-                if let newImage = mBackgroundReplacer.removeBackground(image, newBackground) {
-                    let rep = NSCIImageRep(ciImage: newImage)
-                    mImage = NSImage(size: rep.size)
-                    mImage?.addRepresentation(rep)
-                }
+            if let _ = mImage {
+                replaceBackground(newBackground)
+            }
+            else {
+                mErrorType = .NoImageError
             }
         }
     }

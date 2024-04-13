@@ -28,17 +28,25 @@ struct RemoveBackgroundView: View {
     
     @EnvironmentObject private var appState: AppState
     @EnvironmentObject private var imageManager: ImageManager
+    @State private var showingRemoved: Bool = false
         
     var body: some View {
-        VStack {
-            imageWithoutBackground()
-        }
-        .padding()
+        
+            if !showingRemoved {
+                ImagePreview(imagePreviewWidth, imagePreviewHeight)
+            }
+            else {
+                imageWithoutBackground()
+            }
+            
+            CustomButton(text: "Remove background") {
+                showingRemoved.toggle()
+            }
     }
     
-    private func imageWithoutBackground() -> ImagePreview{
-        imageManager.removeBackground()
-        return ImagePreview()
+    private func imageWithoutBackground() -> ImagePreview {
+        imageManager.replaceBackground(NSImage(named: starsBackground)!)
+        return ImagePreview(imagePreviewWidth, imagePreviewHeight)
     }
 }
 

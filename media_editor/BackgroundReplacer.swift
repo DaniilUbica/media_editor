@@ -10,7 +10,7 @@ import Vision
 
 class BackgroundReplacer {
     
-    func removeBackground(_ image: NSImage, _ background: NSImage = NSImage(named: transparentBackground)!) -> CIImage? {
+    func replaceBackground(_ image: NSImage, _ background: NSImage) -> CIImage? {
         let request = VNGeneratePersonSegmentationRequest()
         
         guard let cgImage = getCGImageFromNSImage(image) else {
@@ -45,13 +45,24 @@ class BackgroundReplacer {
         }
     }
     
+    func removeBackground(_ image: NSImage) -> CIImage? {
+        if let background = NSImage(named: transparentBackground) {
+            return replaceBackground(image, background)
+        }
+        return nil
+    }
+    
     private func blendImages(_ image: CIImage, _ mask: CIImage, _ background: CIImage) -> CIImage? {
         let scaleX = image.extent.size.width / mask.extent.width
         let scaleY = image.extent.size.height / mask.extent.height
         let scaledMask = mask.transformed(by: .init(scaleX: scaleX, y: scaleY))
         
+        let backgroundScaleX = image.extent.size.width / background.extent.width
+        let backgroundScaleY = image.extent.size.height / background.extent.height
+        let backgroundScaled = background.transformed(by: __CGAffineTransformMake(backgroundScaleX, 0, 0, backgroundScaleY, 0, 0))
+                
         let filter = CIFilter(name: "CIBlendWithMask")
-        filter?.setValue(background, forKey: kCIInputBackgroundImageKey)
+        filter?.setValue(backgroundScaled, forKey: kCIInputBackgroundImageKey)
         filter?.setValue(image, forKey: kCIInputImageKey)
         filter?.setValue(scaledMask, forKey: kCIInputMaskImageKey)
         

@@ -11,6 +11,7 @@ struct ContentView: View {
     
     @EnvironmentObject private var appState: AppState
     @EnvironmentObject private var imageManager: ImageManager
+    @State private var filePath: String = ""
     
     var body: some View {
         VStack {
@@ -22,8 +23,11 @@ struct ContentView: View {
             }
             else {
                 HeaderAppInfo()
+                Text("Current file: \(filePath)")
+                    .padding(.top)
+                ImagePreview(mainPageImagePreviewWidth, mainPageImagePreviewHeight)
                 HStack {
-                    FilePicker()
+                    FilePicker(filePath: $filePath)
                 }
                 .padding()
                 

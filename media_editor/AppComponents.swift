@@ -13,8 +13,8 @@ struct HeaderAppInfo:View {
             Image(systemName: "globe")
                 .imageScale(.large)
                 .foregroundStyle(.tint)
+                .padding(.top)
             Text("Media Editor")
-            
         }
     }
 }
@@ -23,6 +23,7 @@ struct FilePicker: View {
     
     @EnvironmentObject private var imageManager: ImageManager
     @State private var openingFile = false
+    @Binding var filePath: String
     
     var body: some View {
         Button("Open file") {
@@ -34,7 +35,8 @@ struct FilePicker: View {
             do {
                 let fileURL = try result.get()
                 if let url = fileURL.first {
-                    imageManager.loadImage(url.path())
+                    filePath = url.path()
+                    imageManager.loadImage(filePath)
                     imageManager.currFileExtension = url.pathExtension
                 }
             }
@@ -59,13 +61,20 @@ struct FileSaver: View {
 struct ImagePreview: View {
     
     @EnvironmentObject private var imageManager: ImageManager
+    let mWidth: CGFloat
+    let mHeight: CGFloat
+    
+    init(_ width: CGFloat, _ height: CGFloat) {
+        mWidth = width
+        mHeight = height
+    }
     
     var body: some View {
         VStack {
             imageManager.uiImage
                 .resizable()
                 .aspectRatio(contentMode: .fit)
-                .frame(minWidth: 200.0, minHeight: 200.0)
+                .frame(minWidth: mWidth, maxWidth: mWidth, minHeight: mHeight, maxHeight: mHeight)
         }
         .padding()
     }
@@ -108,6 +117,10 @@ struct ErrorPrinter: View {
             errorString = "Error: can't save image"
         case .NoImageError:
             errorString = "Error: image is empty"
+        case .BackgroundRemoveError:
+            errorString = "Error: can't remove background"
+        case .BackgroundReplaceError:
+            errorString = "Error: can't replace background"
         }
         return errorString
     }

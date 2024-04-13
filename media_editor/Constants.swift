@@ -22,5 +22,11 @@ let textfieldMinimumHeight = 35.0;
 let textfieldIdealWidth = 275.0;
 let textfieldIdealHeight = 35.0;
 
+let mainPageImagePreviewWidth = 100.0
+let mainPageImagePreviewHeight = 100.0
+
+let imagePreviewWidth = 200.0
+let imagePreviewHeight = 200.0
+
 let transparentBackground = "transparent"
 let starsBackground = "stars"
