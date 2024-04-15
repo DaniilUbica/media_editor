@@ -22,6 +22,7 @@ class ImageManager: ObservableObject {
     
     @Published var mErrorType: ErrorType = .NoError
     @Published var mCurrFileExtension: String = ""
+    @Published var mProcessingNow: Bool = false
     private var mImage: NSImage? = nil
     private let mBackgroundReplacer: BackgroundReplacer = BackgroundReplacer()
      
@@ -36,6 +37,10 @@ class ImageManager: ObservableObject {
         set(newExtension) {
             mCurrFileExtension = newExtension
         }
+    }
+    
+    var processingNow: Bool {
+        mProcessingNow
     }
     
     var image: NSImage? {
@@ -88,42 +93,48 @@ class ImageManager: ObservableObject {
         }
     }
     
-    func removeBackground() {
-        if let image = mImage {
-            if let newImage = mBackgroundReplacer.removeBackground(image) {
-                let rep = NSCIImageRep(ciImage: newImage)
-                mImage = NSImage(size: rep.size)
-                mImage?.addRepresentation(rep)
+    func removeBackground(_ onProcessEnd: @escaping () -> Void) {
+        DispatchQueue.main.async {
+            if let image = self.mImage {
+                if let newImage = self.mBackgroundReplacer.removeBackground(image) {
+                    let rep = NSCIImageRep(ciImage: newImage)
+                    self.mImage = NSImage(size: rep.size)
+                    self.mImage?.addRepresentation(rep)
+                    onProcessEnd()
+                }
+                else {
+                    self.mErrorType = .BackgroundRemoveError
+                }
             }
             else {
-                mErrorType = .BackgroundRemoveError
+                self.mErrorType = .NoImageError
             }
-        }
-        else {
-            mErrorType = .NoImageError
         }
     }
     
-    func replaceBackground(_ newBackground: NSImage) {
-        if let image = mImage {
-            if let newImage = mBackgroundReplacer.replaceBackground(image, newBackground) {
-                let rep = NSCIImageRep(ciImage: newImage)
-                mImage = NSImage(size: rep.size)
-                mImage?.addRepresentation(rep)
+    func replaceBackground(_ newBackground: NSImage?, _ onProcessEnd: @escaping () -> Void) {
+        DispatchQueue.main.async {
+            if let image = self.mImage, let background = newBackground {
+                if let newImage = self.mBackgroundReplacer.replaceBackground(image, background) {
+                    let rep = NSCIImageRep(ciImage: newImage)
+                    self.mImage = NSImage(size: rep.size)
+                    self.mImage?.addRepresentation(rep)
+                    onProcessEnd()
+                }
+                else {
+                    self.mErrorType = .BackgroundReplaceError
+                }
             }
             else {
-                mErrorType = .BackgroundReplaceError
+                self.mErrorType = .NoImageError
             }
-        }
-        else {
-            mErrorType = .NoImageError
         }
     }
     
-    func replaceBackground(_ newBackgroundPath: String) {
+    func replaceBackground(_ newBackgroundPath: String, _ onProcessEnd: @escaping () -> Void) {
         if let newBackground = NSImage(contentsOfFile: newBackgroundPath) {
             if let _ = mImage {
-                replaceBackground(newBackground)
+                replaceBackground(newBackground, onProcessEnd)
             }
             else {
                 mErrorType = .NoImageError

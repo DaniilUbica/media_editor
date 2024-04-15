@@ -19,9 +19,7 @@ struct MainView: View {
             CustomButton(text: "Replace Background") {
                 appState.currentRoute = .ReplaceBackground
             }
-//            CustomButton(text: "Improve Quality") {
-//                appState.currentRoute = .ImproveQuality
-//            }
+            TestImageDragDrop()
         }
         .padding()
     }
@@ -32,26 +30,35 @@ struct RemoveBackgroundView: View {
     @EnvironmentObject private var appState: AppState
     @EnvironmentObject private var imageManager: ImageManager
     @State private var showingRemoved: Bool = false
+    @State private var processingNow: Bool = false
         
     var body: some View {
+        if !showingRemoved {
+            ImagePreview(imagePreviewWidth, imagePreviewHeight)
+        }
+        else {
+            imageWithoutBackground()
+        }
         
-            if !showingRemoved {
-                ImagePreview(imagePreviewWidth, imagePreviewHeight)
+        CustomButton(text: "Remove background") {
+            if imageManager.image != nil {
+                processingNow = true
             }
-            else {
-                imageWithoutBackground()
-            }
-            
-            CustomButton(text: "Remove background") {
-                showingRemoved.toggle()
-            }
+            imageManager.removeBackground(onProcessEnded)
+        }
+        
+        if processingNow {
+            ProgressView("Removing...")
+        }
     }
     
     private func imageWithoutBackground() -> ImagePreview {
-        DispatchQueue.main.async {
-            imageManager.removeBackground()
-        }
         return ImagePreview(imagePreviewWidth, imagePreviewHeight)
+    }
+    
+    private func onProcessEnded() {
+        processingNow = false
+        showingRemoved.toggle()
     }
 }
 
@@ -61,6 +68,7 @@ struct ReplaceBackgroundView: View {
     @EnvironmentObject private var imageManager: ImageManager
     @State private var showingReplaced: Bool = false
     @State private var backgroundFilePath: String = ""
+    @State private var processingNow: Bool = false
         
     var body: some View {
         
@@ -75,18 +83,28 @@ struct ReplaceBackgroundView: View {
                 FilePicker(filePath: $backgroundFilePath, buttonText: "Open background", rewriteImageManagerImage: false)
                 
                 CustomButton(text: "Replace background") {
-                    showingReplaced.toggle()
+                    if imageManager.errorType == .NoError {
+                        if imageManager.image != nil {
+                            processingNow = true
+                        }
+                        let background = NSImage(contentsOfFile: backgroundFilePath)
+                        imageManager.replaceBackground(background, onProcessEnded)
+                    }
+                }
+                
+                if processingNow {
+                    ProgressView("Replacing...")
                 }
             }
     }
     
     private func imageWithReplacedBackground() -> ImagePreview {
-        DispatchQueue.main.async {
-            if let background = NSImage(contentsOfFile: backgroundFilePath) {
-                imageManager.replaceBackground(background)
-            }
-        }
         return ImagePreview(imagePreviewWidth, imagePreviewHeight)
+    }
+    
+    private func onProcessEnded() {
+        processingNow = false
+        showingReplaced.toggle()
     }
 }
 

@@ -35,10 +35,8 @@ struct FilePicker: View {
                 if let url = fileURL.first {
                     filePath = url.path()
                     if rewriteImageManagerImage {
-                        DispatchQueue.main.async {
-                            imageManager.loadImage(filePath)
-                            imageManager.currFileExtension = url.pathExtension
-                        }
+                        imageManager.loadImage(filePath)
+                        imageManager.currFileExtension = url.pathExtension
                     }
                 }
             }
@@ -55,9 +53,7 @@ struct FileSaver: View {
     
     var body: some View {
         Button("Save file") {
-            DispatchQueue.main.async {
-                imageManager.saveImage()
-            }
+            imageManager.saveImage()
         }
     }
 }
